@@ -30,6 +30,10 @@ V   - order new one and rate it
     - calculate the rating for every ice cream
     - get ice cream names (similar to the all_reviews_greater_than_number)
 
+    delete review
+  V  - puts all the icrcream names that the user rate
+  V  - find the review that the user want to delete
+  V  - delete review
 
 
  - check if user already exist
