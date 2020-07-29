@@ -109,6 +109,17 @@ end
 
     # end
 
+    def icecream_list_with_average_rating
+    
+        rating_count = Review.group(:rating).count
+    
+        average_rating = rating_count.collect do |key, value|
+            (key * key) / value
+        end
+        binding.pry
+        ice_cream_count = Review.group(:icecream_id).count
+        ice_cream_count 
+    end 
 
 
     #READ :user can see all the other user's review,

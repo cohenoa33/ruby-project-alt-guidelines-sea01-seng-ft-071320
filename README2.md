@@ -34,6 +34,13 @@ V   - order new one and rate it
   V  - puts all the icrcream names that the user rate
   V  - find the review that the user want to delete
   V  - delete review
+  
+    compute_average
+    - look at the entire list of reviews
+    - group by ice creams
+    - count how many times a flavor appears
+    - compute the average rating for each ice cream
+
 
 
  - check if user already exist
