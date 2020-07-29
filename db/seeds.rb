@@ -1,3 +1,7 @@
+User.destroy_all
+IceCream.destroy_all
+Review.destroy_all
+
 #user
 User.create(
     name: Faker::Name.name

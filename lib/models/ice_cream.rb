@@ -1,4 +1,4 @@
 class IceCream < ActiveRecord::Base
-    has_many :users, through: :reviews
     has_many :reviews
+    has_many :users, through: :reviews
 end

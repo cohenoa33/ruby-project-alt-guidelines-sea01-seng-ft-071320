@@ -7,4 +7,3 @@ class CreateReviews < ActiveRecord::Migration[5.2]
       t.boolean :favorite
     end
   end
-end
