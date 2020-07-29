@@ -67,17 +67,9 @@ class CommandLineInterface
         # binding.pry
         Review.all.order(rating: :desc).distinct
         all_reviews_greater_than_number
-        
-    def changed_my_mined(name, ice_cream)
-        find_review(name, ice_cream)
-        puts "new rating?"
-        new_rating = gets.strip
-        review.select do |a| 
-        a.update({rating:new_rating})
-        end
-        puts "we got ya #{name.name}"
     end
-
+        
+    
     def find_review(name)
         users_review = Review.where(user_id: name.id)
         ice_cream_name = users_review.collect {|review| review.ice_cream.name}
@@ -88,17 +80,22 @@ class CommandLineInterface
         review = Review.where(user_id: name.id,icecream_id: icecream.id)
         review
     end
-        
+    
+    def changed_my_mined(name, review)
+        puts "new rating?"
+        new_rating = gets.strip
+        review.update({rating:new_rating})
+        puts "we got ya #{name.name}"
+    end
     def delete_review(review)
         review.destroy_all
         puts "We deleted your review"
     end
-end
-
+    
     # def icecream_list_with_average_rating
-
+    
     #     Review.all.map {|review| [:icecream_id] = review.rating} 
-
+    
     #     # Review.all.map {|review| hash[:icecream_id] => [:rating}
     #     # Review.all.map do |review|
     #     #     review.icecream_id
@@ -106,27 +103,27 @@ end
     #     Review.all.map do |review| 
     #         review.sum(:rating)
     #     end
-
+    
     # end
-
+    
     def icecream_list_with_average_rating
-    
+        
         rating_count = Review.group(:rating).count
-    
+        
         average_rating = rating_count.collect do |key, value|
-            (key * key) / value
+            (key * value) / value
         end
         binding.pry
         ice_cream_count = Review.group(:icecream_id).count
         ice_cream_count 
     end 
-
-
+    
+    
     #READ :user can see all the other user's review,
     #array with Icecreams name
-
+    
     #UPDATE:user can update favorites and rating 
-
+    
     # def update_ice_cream_name(flavor, topping, new_name)
     #     # icecream = find_ice_cream
     #     icecream.update(name:new_name)
@@ -137,26 +134,27 @@ end
     #user can see the ice cream with the highest ratings
     #user can see all his favorites  icecreams
     
-#     #READ: find the ice_cream_id so we can look for reviews for this id
-#     def find_ice_cream(flavor, topping)
-#         icecream = IceCream.find(flavors: flavor, toppings: topping)
-#         icecream.id
-#     end
-#     # READ: find the user_id so we can look for all the favorite icecreams for this user
-#     #array of icecreams names
-#     def find_user_id(name)
-#         user = User.all.find_by(name: name)
-#         binding.pry
-#         user.id
-#     end
-
-#     def update_review(name)
-#         user =  User.all.find_by(name: name)
-#         ice_cream = find_ice_cream
-
-#     end
+    #     #READ: find the ice_cream_id so we can look for reviews for this id
+    #     def find_ice_cream(flavor, topping)
+    #         icecream = IceCream.find(flavors: flavor, toppings: topping)
+    #         icecream.id
+    #     end
+    #     # READ: find the user_id so we can look for all the favorite icecreams for this user
+    #     #array of icecreams names
+    #     def find_user_id(name)
+    #         user = User.all.find_by(name: name)
+    #         binding.pry
+    #         user.id
+    #     end
     
-#     # def find_all_favorites
-#     #     Review.where(favorite: true).find_each  |review|
-#     # end
+    #     def update_review(name)
+    #         user =  User.all.find_by(name: name)
+    #         ice_cream = find_ice_cream
     
+    #     end
+    
+    #     # def find_all_favorites
+    #     #     Review.where(favorite: true).find_each  |review|
+    #     # end
+    
+end

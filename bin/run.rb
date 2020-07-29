@@ -18,8 +18,10 @@ name = cli.create_new_user(user_input)
 # favorite = cli.add_favorite
 # review = cli.create_new_review(name, icecream, rating, favorite)
 
-review = cli.find_review(name)
-cli.delete_review(review)
+
+yes = cli.find_review(name)
+cli.changed_my_mined(name, yes)
+# cli.delete_review(review)
 
 
 # cli.all_reviews_grater_then_number(8)
