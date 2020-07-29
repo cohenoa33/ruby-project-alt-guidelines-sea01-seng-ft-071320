@@ -67,24 +67,47 @@ class CommandLineInterface
         # binding.pry
         Review.all.order(rating: :desc).distinct
         all_reviews_greater_than_number
-
-    end
-
-    def icecream_list_with_average_rating
-
-        Review.all.map {|review| [:icecream_id] = review.rating} 
-
-
-        # Review.all.map {|review| hash[:icecream_id] => [:rating}
-        # Review.all.map do |review|
-        #     review.icecream_id
-        # end
-        Review.all.map do |review| 
-            review.sum(:rating)
+        
+    def changed_my_mined(name, ice_cream)
+        find_review(name, ice_cream)
+        puts "new rating?"
+        new_rating = gets.strip
+        review.select do |a| 
+        a.update({rating:new_rating})
         end
-
-
+        puts "we got ya #{name.name}"
     end
+
+    def find_review(name)
+        users_review = Review.where(user_id: name.id)
+        ice_cream_name = users_review.collect {|review| review.ice_cream.name}
+        puts "please enter the icecream name for the review"
+        puts ice_cream_name
+        input = gets.strip
+        icecream = IceCream.all.find_by(name: input)
+        review = Review.where(user_id: name.id,icecream_id: icecream.id)
+        review
+    end
+        
+    def delete_review(review)
+        review.destroy_all
+        puts "We deleted your review"
+    end
+end
+
+    # def icecream_list_with_average_rating
+
+    #     Review.all.map {|review| [:icecream_id] = review.rating} 
+
+    #     # Review.all.map {|review| hash[:icecream_id] => [:rating}
+    #     # Review.all.map do |review|
+    #     #     review.icecream_id
+    #     # end
+    #     Review.all.map do |review| 
+    #         review.sum(:rating)
+    #     end
+
+    # end
 
 
 
@@ -92,19 +115,6 @@ class CommandLineInterface
     #array with Icecreams name
 
     #UPDATE:user can update favorites and rating 
-
-    def changed_my_mined(name, ice_cream)
-        user = User.all.find_by(name: name)
-        icecream = IceCream.all.find_by(name: ice_cream)
-        review = Review.where(user_id: user.id, icecream_id: icecream.id)
-        puts "new rating?"
-        new_rating = gets.strip
-        # binding.pry
-        review.select do |a| 
-            a.update({rating:new_rating})
-        end
-        puts "we got ya"
-    end
 
     # def update_ice_cream_name(flavor, topping, new_name)
     #     # icecream = find_ice_cream
@@ -138,8 +148,4 @@ class CommandLineInterface
 #     # def find_all_favorites
 #     #     Review.where(favorite: true).find_each  |review|
 #     # end
-#     # => DELETE
     
-#     #user can delete the review
-    
-end
