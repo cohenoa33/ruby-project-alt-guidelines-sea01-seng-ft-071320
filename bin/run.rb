@@ -23,7 +23,7 @@ cli.menu_select(name)
 # cli.changed_my_mind(name, yes)
 
 # #Delete
-# review = cli.find_review(name)
+# review = cli.find_review(name, "Delete")
 # cli.delete_review(review)
 
 
