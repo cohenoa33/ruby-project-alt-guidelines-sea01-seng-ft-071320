@@ -1,3 +1,16 @@
+TODO:
+
+- change the message for the menu function "tell us what you want?"
+
+- get_review if customer fix the duplicate reviews for the same ice cream name
+  - this method affect/works on the find_review method too
+
+- Delte_review
+
+- Top 5  + find_old_review : cuntinue to order directly 
+
+
+
 step 1:
   V  - greets the user
   V  - ask user's name
@@ -25,21 +38,18 @@ V   - order new one and rate it
     - exit: puts: bye bye
 
     compute_average
-    - look at all elements in Review
-    - group all the ratings according to the ice cream id
-    - calculate the rating for every ice cream
-    - get ice cream names (similar to the all_reviews_greater_than_number)
+  V  - look at all elements in Review
+  V  - group all the ratings according to the ice cream id
+  V  - calculate the rating for every ice cream
+  V  - get ice cream names (similar to the all_reviews_greater_than_number)
 
     delete review
   V  - puts all the icrcream names that the user rate
   V  - find the review that the user want to delete
   V  - delete review
-  
-    compute_average
-    - look at the entire list of reviews
-    - group by ice creams
-    - count how many times a flavor appears
-    - compute the average rating for each ice cream
+
+
+
 
 
 

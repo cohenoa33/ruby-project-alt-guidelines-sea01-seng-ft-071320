@@ -3,24 +3,27 @@ require 'pry'
 # puts "hello world"
 
 
-
 cli = CommandLineInterface.new
 user_input= cli.greet
 name = cli.create_new_user(user_input)
-# cli.menu(name)
+cli.menu(name)
+cli.menu_select(name)
+
+# CREATE:
 # cli.get_user_input
 # cli.order
 # cli.add_name_to_icecream
 # cli.get_review(name)
-# cli.all_reviews_greater_than_number
-# cli.top_five
+
+# #READ: TOP 5
 # cli.icecream_list_with_average_rating
-# favorite = cli.add_favorite
-# review = cli.create_new_review(name, icecream, rating, favorite)
 
+# #UPDATE 
+# yes = cli.find_review(name)
+# cli.changed_my_mind(name, yes)
 
-yes = cli.find_review(name)
-cli.changed_my_mined(name, yes)
+# #Delete
+# review = cli.find_review(name)
 # cli.delete_review(review)
 
 
@@ -29,3 +32,13 @@ cli.changed_my_mined(name, yes)
 
 # cli.find_ice_cream("vanilla", "reeses")
 # cli.find_user_id("taci")
+
+
+
+# def get_review(name)
+#     puts "Enjoy! please rate your ice cream (a number between 1-10)"
+#     rating = gets.strip
+#     favorite = update_favorite
+#     Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
+#     puts "Thanks #{name.name}"
+# end
