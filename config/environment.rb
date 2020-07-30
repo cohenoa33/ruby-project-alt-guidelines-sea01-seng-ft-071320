@@ -7,3 +7,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 require_all 'lib'
+require 'colorize'
+require 'colorized_string'
+
+require 'artii'
