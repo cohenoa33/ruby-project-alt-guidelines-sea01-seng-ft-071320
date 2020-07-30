@@ -31,21 +31,23 @@ class CommandLineInterface
     end
 
     def order
-        puts "what's your flavor for today?"
+        puts "What's your flavor for today?"
         flavor = get_user_input
-        puts "which topping to add?"
+        puts "Which topping do you want to add?"
         topping = get_user_input
         IceCream.find_or_create_by(flavors: flavor, toppings: topping)
         add_name_to_icecream
     end
     
+    # downcase makes it case insensitive when we type yes or Yes in the terminal
+    # and we still get the same results.
     def add_favorite
         puts "Do you want to add this to your favorite?"
-        puts "type 'Yes' or 'No'"
-        input = get_user_input
-        if input == "Yes"  
+        puts "Type 'Yes' or 'No'"
+        input = get_user_input.downcase
+        if input == "yes"
             input = true
-        elsif input == "No" 
+        elsif input == "no" 
             input = false
         else
             invalid_command
@@ -54,84 +56,83 @@ class CommandLineInterface
         input
     end
 
+    # changed the condition to just look for 2 numbers rather than look at the entire array of numbers
     def get_review(name)
-        puts "Please rate your ice cream (a number between 1-10)"
+        puts "Please rate your ice cream (a number between 1-10)."
         rating = get_user_input
-        if (1..10).member?(rating.to_i)
-        favorite = add_favorite
-        Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
-        puts "Thanks #{name.name}, see you soon!"
+        if rating.to_i >= 1 && rating.to_i <= 10
+            favorite = add_favorite
+            Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
+            puts "Thanks #{name.name}, see you soon!"
         else 
             invalid_command
             get_review(name)
         end
     end
         
-    def icecream_list_with_average_rating # return top5
+    # sorted the ice cream ratings and iterated through the values to create a hash where the keys are ids 
+    # and ratings are the values.
+    # then sorted everything in descending order and puts in screen in a list
+    def icecream_list_with_average_rating(name) # return top5
         ice_cream_rating = Review.group(:icecream_id).average(:rating)
-        list = ice_cream_rating.map do |k, v|
-            "#{v.to_i} => #{IceCream.find(k).name}"
+        sorted_list = ice_cream_rating.map {|key, value| {id: key, rating: value.to_i}}.sort_by{|hash| hash[:rating]}.reverse
+        list = sorted_list.slice(0, 5).map do |hash|
+            "#{hash[:rating]} => #{IceCream.find(hash[:id]).flavors.downcase}"
         end
-        array_of_flav = list.sort.reverse
         puts "Here are our Top 5:"
-        puts array_of_flav.slice(0, 5)
+        puts list.join("\n")
         puts "Do you want to order?"
+        new_order(name)
     end
 
     def find_old_review(name)
         name_review = Review.where(user_id: name.id)
         if name_review.size > 0
-            find_the_one(name)
+            review = find_review(name, "update")
+            changed_my_mind(name, review)
         else
-            puts "look like it's your first time here, would you like to order?"
+            puts "Looks like it's your first time here. Would you like to order?"
         end
+        new_order(name)
     end
 
     def changed_my_mind(name, review)
-        puts "New rating?"
+        puts "What's your new rating?"
         new_rating = get_user_input
-        if (1..10).member?(new_rating.to_i)
-        review.update({rating:new_rating})
-        puts "We got ya #{name.name}, see you soon!"
+        if new_rating.to_i >= 1 && new_rating.to_i <= 10
+            review.update({rating:new_rating})
+            puts "We got ya #{name.name}, see you soon!"
         else 
-        invalid_command
-        changed_my_mind(name, review)
+            invalid_command
+            changed_my_mind(name, review)
         end
     end
 
+    def new_order(name)
+        order
+        add_name_to_icecream
+        get_review(name)
+    end
 
-    def find_the_one(name)
+    # combined find_review and find_the_one methods in one and passed in an argument to 
+    # select which command we want to perform, delete and update.
+    def find_review(name, action)
         name_review = Review.where(user_id: name.id)
         ice_cream_name = name_review.collect {|review| review.ice_cream.name}.uniq
-        puts "Please type the ice cream name that you want to edit."
+        puts "Please type the ice cream name that you want to #{action}."
         puts ice_cream_name
         input = get_user_input
         if ice_cream_name.include?(input)
-        icecream = IceCream.all.find_by(name: input)
-        review = Review.where(user_id: name.id, icecream_id: icecream.id)
-        changed_my_mind(name, review)
+            icecream = IceCream.all.find_by(name: input)
+            review = Review.where(user_id: name.id, icecream_id: icecream.id)
         else 
-        invalid_command
-        find_the_one(name)
+            invalid_command
+            review = find_review(name, action)
         end
         review
     end
 
 
-    def find_review(name)
-        users_review = Review.where(user_id: name.id)
-        ice_cream_name = users_review.collect {|review| review.ice_cream.name}.uniq
-        puts "Please type the ice cream name for the review."
-        puts ice_cream_name
-        input = get_user_input
-        ice_cream_name.include?(input)
-        icecream = IceCream.all.find_by(name: input)
-        review = Review.where(user_id: name.id, icecream_id: icecream.id)
-        review
-
-    end
-
-    
     def delete_review(review)
         review.destroy_all
         puts "We deleted your review, see you soon!"
@@ -141,29 +142,28 @@ class CommandLineInterface
         user_input = get_user_input
         
         if user_input == 'Order'
-        order
-        add_name_to_icecream
-        get_review(name)
+            order
+            add_name_to_icecream
+            get_review(name)
 
         elsif user_input == 'Top 5'
-        icecream_list_with_average_rating
+            icecream_list_with_average_rating(name)
 
         elsif user_input == 'Update'
-        find_old_review(name)
-     
+            find_old_review(name)
 
         elsif user_input == 'Delete'
-            review = find_review(name)
+            review = find_review(name, "delete")
             delete_review(review)
         else
-        invalid_command
-        menu(name)
-        menu_select(name)
+            invalid_command
+            menu(name)
+            menu_select(name)
         end
         
     end
 
     def invalid_command
-        puts 'Please enter a valid command'
+        puts 'Please enter a valid command.'
     end
 end
