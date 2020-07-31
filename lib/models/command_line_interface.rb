@@ -3,7 +3,7 @@ class CommandLineInterface
 
     def greet 
         UserOutputs.greeting
-        gets.strip
+        get_user_input.capitalize
     end
 
     def create_new_user(user_input)
@@ -15,9 +15,15 @@ class CommandLineInterface
     end
 
     def get_user_input
-        gets.strip.downcase
+        input = gets.strip.downcase
+        if input.empty?
+            UserOutputs.invalid
+            get_user_input
+        else 
+            input
+        end
     end
-    
+
     def add_name_to_icecream 
         IceCream.all.each do |icecream|
             if icecream.name == nil
@@ -33,7 +39,7 @@ class CommandLineInterface
         ice_cream_name = IceCream.all.first {|icecream| icecream.name == flavor}
         if !is_flavor 
             UserOutputs.topping
-            topping = get_user_input
+            topping = gets.strip.downcase
             IceCream.find_or_create_by(flavors: flavor, toppings: topping)
             add_name_to_icecream
             check_same_orders(name, IceCream.last.id)
@@ -56,18 +62,19 @@ class CommandLineInterface
         input
     end
 
-    def check_same_orders(name, icecream_id)
+    def check_same_orders(name, icecream_id) # add icream_id as second argument 
         if name.reviews.find_by(icecream_id:IceCream.last.id)
             UserOutputs.updated
             rating = get_user_input
-            if rating.to_i >= 1 && rating.to_i <= 10
+            if 
+                rating.to_i >= 1 && rating.to_i <= 10
                 favorite = add_favorite
                 a = name.reviews.find_by(icecream_id:IceCream.last.id)
                 a.update(rating: rating.to_i, favorite: favorite)
                 UserOutputs.thanks(name)
             else
                 invalid_command
-                check_same_orders(name)
+                check_same_orders(name, icecream_id)
             end
         else
             get_review(name)
@@ -77,7 +84,8 @@ class CommandLineInterface
     def get_review(name)
         UserOutputs.rating(name)
         rating = get_user_input
-        if rating.to_i >= 1 && rating.to_i <= 10
+        if 
+            rating.to_i >= 1 && rating.to_i <= 10
             favorite = add_favorite
             Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
             UserOutputs.thanks(name)
@@ -111,16 +119,17 @@ class CommandLineInterface
                 review = find_review(name, user_input)
                 delete_review(review)
             end
-            else
-                UserOutputs.first_time
-                is_menu(name)
+        else
+            UserOutputs.first_time
+            is_menu(name)
         end
     end
 
     def review_update(name, review)
         UserOutputs.new_rating
         new_rating = get_user_input
-        if new_rating.to_i >= 1 && new_rating.to_i <= 10
+        if 
+            new_rating.to_i >= 1 && new_rating.to_i <= 10
             review.update({rating:new_rating})
             UserOutputs.soon(name)
         else 
@@ -134,13 +143,9 @@ class CommandLineInterface
         UserOutputs.option(action)
         puts ice_cream_names
         input = get_user_input
-        if ice_cream_names.include?(input)
+            ice_cream_names.include?(input)
             icecream = IceCream.all.find_by(name: input)
             review = Review.where(user_id: name.id, icecream_id: icecream.id)
-        else 
-            invalid_command
-            review = find_review(name, action)
-        end
         review
     end
 
@@ -171,9 +176,15 @@ class CommandLineInterface
         UserOutputs.invalid
     end
 
+    def create_menu
+        menu = IceCream.all.map {|icecream| "* #{icecream.name.capitalize} => #{icecream.flavors} with #{icecream.toppings} on top\n"}.join
+        colorizer = Lolize::Colorizer.new
+        colorizer.write menu
+    end
+
     def ice_cream_menu(name)
-        menu = IceCream.all.map {|icecream| "* #{icecream.name.capitalize} => #{icecream.flavors} with #{icecream.toppings} on top"}
-        puts menu
+        UserOutputs.menu
+        create_menu
         sleep 2
         new_order(name)
     end

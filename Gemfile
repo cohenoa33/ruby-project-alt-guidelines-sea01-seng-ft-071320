@@ -11,4 +11,6 @@ gem 'rake'
 gem 'json'
 gem 'colorize'
 gem 'artii'
+gem 'lolize'
+
 
