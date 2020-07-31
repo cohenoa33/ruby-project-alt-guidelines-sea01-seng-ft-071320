@@ -3,7 +3,7 @@ class CommandLineInterface
 
     def greet 
         UserOutputs.greeting
-        gets.strip
+        user_input_with_string.capitalize
     end
 
     def create_new_user(user_input)
@@ -12,6 +12,16 @@ class CommandLineInterface
  
     def menu(name)
         UserOutputs.menu_list(name)
+    end
+
+    def user_input_with_string
+        input = gets.strip.downcase
+        if input.empty?
+            UserOutputs.invalid
+            user_input_with_string
+        else 
+            input
+        end
     end
 
     def get_user_input
@@ -28,12 +38,12 @@ class CommandLineInterface
 
     def new_order(name)
         UserOutputs.flavor
-        flavor = get_user_input
+        flavor = user_input_with_string
         is_flavor = IceCream.all.any? {|icecream| icecream.name == flavor}
         ice_cream_name = IceCream.all.first {|icecream| icecream.name == flavor}
         if !is_flavor 
             UserOutputs.topping
-            topping = get_user_input
+            topping = gets.strip.downcase
             IceCream.find_or_create_by(flavors: flavor, toppings: topping)
             add_name_to_icecream
             check_same_orders(name, IceCream.last.id)
