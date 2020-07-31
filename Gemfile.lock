@@ -22,10 +22,13 @@ GEM
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     json (2.3.1)
+    lolize (0.0.3)
+      paint (~> 0.8.3)
     method_source (1.0.0)
     minitest (5.14.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
+    paint (0.8.7)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -58,6 +61,7 @@ DEPENDENCIES
   colorize
   faker
   json
+  lolize
   pry
   rake
   require_all

@@ -1,14 +1,21 @@
 
-#Scoopy CLI App
+Scoopy CLI App 🍧🍦🍨
+===============
 
+---
 
-Scoopy provides users the ability to create their own unique ice cream flavors with a variety of toppings of their choosing, add a rating and add it to the list of favorites.
+#### Scoopy 
+provides users the ability to create their own unique ice cream flavors with a variety of toppings of their choosing,
+add a rating and add it to the list of favorites.
 Users are able update their review and delete.
 
 
-***To start using Scoopy**
+## To start using Scoopy
 
 
-Run /bin.run.rb in your terminal
+In your terminal run:
+```ruby
+/bin.run.rb
+```
 
-![Screenshot](Screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/tshlos/ruby-project-alt-guidelines-sea01-seng-ft-071320/noa-taci/Screenshot%20.png)

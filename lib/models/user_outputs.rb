@@ -1,7 +1,7 @@
 
 class UserOutputs
     def welcome 
-        a = Artii::Base.new
+        a = Artii::Base.new 
         a.asciify("Welcome")
         puts a.asciify('Welcome to Scoopy')
     end
@@ -79,5 +79,10 @@ class UserOutputs
     def self.menu?
         puts "Do you want to check the menu first? Please type yes/no".light_magenta
     end
+
+    def self.menu
+        puts "\nMenu".magenta.on_light_white.bold
+    end
+
 end
 
