@@ -9,7 +9,7 @@ User.create(
 
 #ice cream
 IceCream.create(
-    name: Faker::Hipster.word, 
+    name: Faker::Hipster.word.downcase, 
     flavors: Faker::Dessert.flavor, 
     toppings: Faker::Dessert.topping
 )

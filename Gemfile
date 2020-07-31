@@ -9,4 +9,6 @@ gem "require_all"
 gem "faker"
 gem 'rake'
 gem 'json'
+gem 'colorize'
+gem 'artii'
 

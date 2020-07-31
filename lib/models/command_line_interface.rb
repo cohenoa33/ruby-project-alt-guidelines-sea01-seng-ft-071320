@@ -1,7 +1,8 @@
-class CommandLineInterface 
+
+class CommandLineInterface
 
     def greet 
-        puts "Hey, what's the scoop? Tell us your name!"
+        UserOutputs.greeting
         gets.strip
     end
 
@@ -10,16 +11,11 @@ class CommandLineInterface
     end
  
     def menu(name)
-        puts "Hey #{name.name},
-        tell as what you want?"
-        puts "Order - to make a new order"  
-        puts "Top 5 - for see our top 5"
-        puts "Update - to update your review"
-        puts "Delete -  to delete your review"
+        UserOutputs.menu_list(name)
     end
 
     def get_user_input
-        gets.strip
+        gets.strip.downcase
     end
     
     def add_name_to_icecream 
@@ -30,21 +26,25 @@ class CommandLineInterface
         end
     end
 
-    def order
-        puts "What's your flavor for today?"
+    def new_order(name)
+        UserOutputs.flavor
         flavor = get_user_input
-        puts "Which topping do you want to add?"
-        topping = get_user_input
-        IceCream.find_or_create_by(flavors: flavor, toppings: topping)
-        add_name_to_icecream
+        is_flavor = IceCream.all.any? {|icecream| icecream.name == flavor}
+        ice_cream_name = IceCream.all.first {|icecream| icecream.name == flavor}
+        if !is_flavor 
+            UserOutputs.topping
+            topping = get_user_input
+            IceCream.find_or_create_by(flavors: flavor, toppings: topping)
+            add_name_to_icecream
+            check_same_orders(name, IceCream.last.id)
+        else
+            check_same_orders(name, ice_cream_name.id)  
+        end
     end
-    
-    # downcase makes it case insensitive when we type yes or Yes in the terminal
-    # and we still get the same results.
+
     def add_favorite
-        puts "Do you want to add this to your favorite?"
-        puts "Type 'Yes' or 'No'"
-        input = get_user_input.downcase
+        UserOutputs.favorite?
+        input = get_user_input
         if input == "yes"
             input = true
         elsif input == "no" 
@@ -56,73 +56,85 @@ class CommandLineInterface
         input
     end
 
-    # changed the condition to just look for 2 numbers rather than look at the entire array of numbers
+    def check_same_orders(name, icecream_id)
+        if name.reviews.find_by(icecream_id:IceCream.last.id)
+            UserOutputs.updated
+            rating = get_user_input
+            if rating.to_i >= 1 && rating.to_i <= 10
+                favorite = add_favorite
+                a = name.reviews.find_by(icecream_id:IceCream.last.id)
+                a.update(rating: rating.to_i, favorite: favorite)
+                UserOutputs.thanks(name)
+            else
+                invalid_command
+                check_same_orders(name)
+            end
+        else
+            get_review(name)
+        end
+    end
+
     def get_review(name)
-        puts "Please rate your ice cream (a number between 1-10)."
+        UserOutputs.rating(name)
         rating = get_user_input
         if rating.to_i >= 1 && rating.to_i <= 10
             favorite = add_favorite
             Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
-            puts "Thanks #{name.name}, see you soon!"
+            UserOutputs.thanks(name)
         else 
             invalid_command
             get_review(name)
         end
     end
-        
-    # sorted the ice cream ratings and iterated through the values to create a hash where the keys are ids 
-    # and ratings are the values.
-    # then sorted everything in descending order and puts in screen in a list
-    def icecream_list_with_average_rating(name) # return top5
+
+    def icecream_list_with_average_rating(name)
         ice_cream_rating = Review.group(:icecream_id).average(:rating)
         sorted_list = ice_cream_rating.map {|key, value| {id: key, rating: value.to_i}}.sort_by{|hash| hash[:rating]}.reverse
         list = sorted_list.slice(0, 5).map do |hash|
-            "#{hash[:rating]} => #{IceCream.find(hash[:id]).flavors.downcase}"
+            "#{hash[:rating]} => #{IceCream.find(hash[:id]).flavors.downcase} with #{IceCream.find(hash[:id]).toppings.downcase}"
         end
-        puts "Here are our Top 5:"
+        UserOutputs.top_5
         puts list.join("\n")
-        puts "Do you want to order?"
-        new_order(name)
+        sleep 2
+        UserOutputs.any_flavor
+        is_menu(name)
     end
 
-    def find_old_review(name)
+    def find_old_review(name, user_input)
+        user_input 
         name_review = Review.where(user_id: name.id)
         if name_review.size > 0
-            review = find_review(name, "update")
-            changed_my_mind(name, review)
-        else
-            puts "Looks like it's your first time here. Would you like to order?"
+            if user_input == "update"
+                review = find_review(name, user_input)
+                review_update(name, review)
+            else 
+                review = find_review(name, user_input)
+                delete_review(review)
+            end
+            else
+                UserOutputs.first_time
+                is_menu(name)
         end
-        new_order(name)
     end
 
-    def changed_my_mind(name, review)
-        puts "What's your new rating?"
+    def review_update(name, review)
+        UserOutputs.new_rating
         new_rating = get_user_input
         if new_rating.to_i >= 1 && new_rating.to_i <= 10
             review.update({rating:new_rating})
-            puts "We got ya #{name.name}, see you soon!"
+            UserOutputs.soon(name)
         else 
             invalid_command
-            changed_my_mind(name, review)
+            review_update(name, review)
         end
     end
 
-    def new_order(name)
-        order
-        add_name_to_icecream
-        get_review(name)
-    end
-
-    # combined find_review and find_the_one methods in one and passed in an argument to 
-    # select which command we want to perform, delete and update.
     def find_review(name, action)
-        name_review = Review.where(user_id: name.id)
-        ice_cream_name = name_review.collect {|review| review.ice_cream.name}.uniq
-        puts "Please type the ice cream name that you want to #{action}."
-        puts ice_cream_name
+        ice_cream_names = name.reviews.collect {|review| review.ice_cream.name}.uniq
+        UserOutputs.option(action)
+        puts ice_cream_names
         input = get_user_input
-        if ice_cream_name.include?(input)
+        if ice_cream_names.include?(input)
             icecream = IceCream.all.find_by(name: input)
             review = Review.where(user_id: name.id, icecream_id: icecream.id)
         else 
@@ -132,38 +144,50 @@ class CommandLineInterface
         review
     end
 
-
     def delete_review(review)
-        review.destroy_all
-        puts "We deleted your review, see you soon!"
+        review.destroy_all && UserOutputs.delete_all if review
     end
     
     def menu_select(name)
         user_input = get_user_input
         
-        if user_input == 'Order'
-            order
-            add_name_to_icecream
-            get_review(name)
-
-        elsif user_input == 'Top 5'
+        if user_input == 'order'
+            is_menu(name)
+        elsif user_input == 'top 5'
             icecream_list_with_average_rating(name)
-
-        elsif user_input == 'Update'
-            find_old_review(name)
-
-        elsif user_input == 'Delete'
-            review = find_review(name, "delete")
+        elsif user_input == 'update'
+            find_old_review(name, user_input)
+        elsif user_input == 'delete'
+            review = find_old_review(name, user_input)
             delete_review(review)
         else
             invalid_command
             menu(name)
             menu_select(name)
         end
-        
     end
 
     def invalid_command
-        puts 'Please enter a valid command.'
+        UserOutputs.invalid
+    end
+
+    def ice_cream_menu(name)
+        menu = IceCream.all.map {|icecream| "* #{icecream.name.capitalize} => #{icecream.flavors} with #{icecream.toppings} on top"}
+        puts menu
+        sleep 2
+        new_order(name)
+    end
+
+    def is_menu(name)
+        UserOutputs.menu?
+        user_input = get_user_input
+        if user_input == 'yes'
+            ice_cream_menu(name)
+        elsif user_input == 'no'
+            new_order(name)
+        else 
+            invalid_command
+            is_menu(name)
+        end
     end
 end
