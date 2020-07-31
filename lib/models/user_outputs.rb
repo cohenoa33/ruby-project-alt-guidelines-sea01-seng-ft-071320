@@ -80,9 +80,8 @@ class UserOutputs
         puts "Do you want to check the menu first? Please type yes/no".light_magenta
     end
 
-    def self.menu
-        puts "\nMenu".magenta.on_light_white.bold
+     def self.menu
+        puts "\nMenu \u{1F366}".blue.underline 
     end
-
 end
 
