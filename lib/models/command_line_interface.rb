@@ -62,12 +62,11 @@ class CommandLineInterface
         input
     end
 
-    def check_same_orders(name, icecream_id) # add icream_id as second argument 
+    def check_same_orders(name, icecream_id)
         if name.reviews.find_by(icecream_id:IceCream.last.id)
             UserOutputs.updated
             rating = get_user_input
-            if 
-                rating.to_i >= 1 && rating.to_i <= 10
+            if rating.to_i >= 1 && rating.to_i <= 10
                 favorite = add_favorite
                 a = name.reviews.find_by(icecream_id:IceCream.last.id)
                 a.update(rating: rating.to_i, favorite: favorite)
@@ -84,8 +83,7 @@ class CommandLineInterface
     def get_review(name)
         UserOutputs.rating(name)
         rating = get_user_input
-        if 
-            rating.to_i >= 1 && rating.to_i <= 10
+        if rating.to_i >= 1 && rating.to_i <= 10
             favorite = add_favorite
             Review.create(user_id: name.id, icecream_id: IceCream.last.id, rating: rating.to_i, favorite: favorite)
             UserOutputs.thanks(name)
@@ -128,8 +126,7 @@ class CommandLineInterface
     def review_update(name, review)
         UserOutputs.new_rating
         new_rating = get_user_input
-        if 
-            new_rating.to_i >= 1 && new_rating.to_i <= 10
+        if new_rating.to_i >= 1 && new_rating.to_i <= 10
             review.update({rating:new_rating})
             UserOutputs.soon(name)
         else 
@@ -143,9 +140,13 @@ class CommandLineInterface
         UserOutputs.option(action)
         puts ice_cream_names
         input = get_user_input
-            ice_cream_names.include?(input)
+        if ice_cream_names.include?(input)
             icecream = IceCream.all.find_by(name: input)
             review = Review.where(user_id: name.id, icecream_id: icecream.id)
+        else
+            invalid_command
+            review = find_review(name, action)
+        end
         review
     end
 
